@@ -1,0 +1,3261 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "glados",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2208,
+        -112
+      ],
+      "id": "2c78c778-901e-46d2-ad79-028288cdd1e8",
+      "name": "Webhook",
+      "webhookId": "xxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b4e65e1d-ac6f-42a7-a11a-755f0b9b3d2a",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "rightValue": "glados",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "f2b6ee73-1863-4be0-bfdc-65affd6f8d4b",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "rightValue": "Glados",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -976,
+        -240
+      ],
+      "id": "1ad311ad-567e-483b-b821-c091d7cd2a04",
+      "name": "Verifica se é mencionado"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Webhook').item.json.body.data.message.conversation }}"
+            },
+            {
+              "content": "Se a mensagem do usuário for referente à problema, erro ou verificação exclusivamente de um CARREGAMENTO acompanhado do número do mesmo, Responda somente com o número 1. Se não for nada relacionado a isso, responda apenas com o número 0.",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -192,
+        -736
+      ],
+      "id": "00011854-eab0-417a-accf-bd1e5286457f",
+      "name": "Verifica se é sobre carregamento",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8b9b434a-c443-46d1-82db-15c204f9437c",
+              "leftValue": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+              "rightValue": "@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1120,
+        -96
+      ],
+      "id": "4c73bc7e-a8ce-4c60-a722-65b969f541d5",
+      "name": "Verifica se é grupo"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "=\\b(carreg|numcar|carregamento)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "c4f1a3b1-44ab-4386-9581-456427052461"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Carregamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "29f647a1-3e17-40d7-bd15-69ece6fd4984",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(rotina)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rotina"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2a956e55-f05e-4a59-a677-1ab47d551788",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(derrubar|derruba|derubar|deruba)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Derruba"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "231507a1-d375-4359-914c-fedb0ad41f7b",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(chamado|chamados|ticket|tickets|tiket|tikets|tikcet|tikcets)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Chamado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b2d1b684-02db-40e3-ad28-acfaad7ffa7e",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(nome)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Nome/ID"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5e3e354b-4f14-484a-89e4-a681558133ea",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(abra|abrir|abertura|crie|criar)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Abertura"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6a5d69fe-7025-423c-8ad0-1cc7dd63f114",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(encerre|encerrar|encerrado|resolva|resolver|resolvido|feche|fechar|fechado)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=Encerrar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "017cc04b-ad1e-47ed-aa12-57cd238efdab",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(atualize|atualiza|atualizar|acrescente|responda|responder|resposta|inclua|incluir)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Atualizar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6003648d-250c-4986-a957-d7c1763f7467",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "\\b(matrícula|Matrícula|matricula|código|codigo)\\b",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Matrícula"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "14ccdf58-9669-4632-91a4-a739d5d02f64",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "liberar_pedido",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Liberar Ped"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cf16a277-38f8-415b-8219-3c6d6176b245",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "estoque",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Estoque"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        -192
+      ],
+      "id": "5565612c-013e-4cd9-8d26-28d65e96ef54",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2b628d4e-ee48-4a1e-a873-7b7ab1a25524",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        -736
+      ],
+      "id": "d39cbcb5-bb9a-4f1f-836e-67106b7b9d88",
+      "name": "Confirmação"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/webhook/glados-carregamento-wms",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"dadosWebhook\": {{ JSON.stringify($('Webhook').first().json) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        -736
+      ],
+      "id": "2d2960f0-9649-45f4-bf52-8138b0dd99a4",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9798ae1-da94-4096-be74-2fabe10889b7",
+              "leftValue": "={{ $('Webhook').item.json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1344,
+        -96
+      ],
+      "id": "f7c965c9-ef78-4438-aaa7-5a9f758901ba",
+      "name": "Filtro mensagem própria"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Webhook').item.json.body.data.message.conversation }}"
+            },
+            {
+              "content": "Se a mensagem do usuário for referente à consulta, verificação, problema, erro ou solicitação de acesso a uma rotina do sistema WinThor, acompanhada do número da rotina e da matrícula do usuário, responda somente em JSON no formato:\n\n{\n  \"rotina\": \"NUMERO_DA_ROTINA\",\n  \"matricula\": \"MATRICULA\"\n}\n\nNão escreva nenhuma explicação, texto adicional, emoji, markdown ou quebra de linha fora do JSON.\n\nSe a mensagem não for relacionada a rotina do WinThor, ou se não contiver claramente o número da rotina e a matrícula do usuário, responda somente:\n\n{\n  \"rotina\": \"0\",\n  \"matricula\": \"0\"\n}",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -192,
+        -544
+      ],
+      "id": "901256d2-5d1a-454f-8117-d8d38eb091dd",
+      "name": "Verifica se é sobre rotinas",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3b16f4ef-309b-4700-9afc-eeef8b966836",
+              "leftValue": "={{ $json.message.content.rotina }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "fc8df05a-6919-4ded-a042-ed2d155f6855",
+              "leftValue": "={{ $json.message.content.matricula }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        -544
+      ],
+      "id": "fa5dc64a-ade1-43cd-be4b-5b6f41121e77",
+      "name": "Garante que é sobre rotina",
+      "alwaysOutputData": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/webhook/glados-rotina",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"dadosWebhook\": {{ JSON.stringify($('Webhook').first().json) }},\n  \"dadosConsulta\": {{ JSON.stringify($('Garante que é sobre rotina').first().json) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        -544
+      ],
+      "id": "84990fb3-6a9b-4900-af27-4fb160380d17",
+      "name": "HTTP Request1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Webhook').item.json.body.data.message.conversation }}"
+            },
+            {
+              "content": "=Analise a mensagem do usuário e identifique se é uma solicitação para derrubar, desbloquear, desconectar ou liberar um usuário no WinThor (rotina 528).\n\nSe a mensagem for sobre isso E possuir matrícula/código/número do usuário, responda apenas:\n\n{\"resposta\":1,\"matricula\":\"numero\"}\n\nSe for sobre isso mas não possuir número:\n\n{\"resposta\":0,\"matricula\":null}\n\nSe não for relacionado ao assunto:\n\n{\"resposta\":0,\"matricula\":null}\n\nNunca invente matrícula.\nResponda apenas em JSON.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -192,
+        -352
+      ],
+      "id": "d317f06d-0f8c-4d94-a657-f67f87676c9e",
+      "name": "Verifica se é sobre derrubar",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "20405b28-f8ba-46c3-936d-71e1804e6253",
+              "leftValue": "={{ $json.message.content.resposta }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "7046f58e-d7d8-4234-ad71-1c3adeaa04de",
+              "leftValue": "={{ $json.message.content.matricula }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        -352
+      ],
+      "id": "c81c4164-4e65-42d8-8ea3-2cd04921ce3f",
+      "name": "Garante que é sobre derrubar"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/webhook/glados-derruba",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"dadosWebhook\": {{ JSON.stringify($('Webhook').first().json) }},\n  \"dadosConsulta\": {{ JSON.stringify($('Garante que é sobre derrubar').first().json) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        -352
+      ],
+      "id": "d46e34fd-3bee-49ca-8966-76169fc652d6",
+      "name": "HTTP Request2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Webhook').item.json.body.data.message.conversation }}"
+            },
+            {
+              "content": "Você é um classificador de mensagens.\n\nAnalise a mensagem do usuário.\n\nSe a mensagem for relacionada a:\n- chamados\n- tickets\n- GLPI\n- suporte\n- atendimento\n- SLA\n- incidentes\n- problemas técnicos\n- acesso\n- liberação\n- vencimento\n- resolução\n- categoria\n- técnico\n- usuário\n- abertura\n- fechamento\n\nretorne:\n\n{\n  \"response\": 1,\n  \"RESPOSTA\": \"mensagem original do usuário\"\n}\n\nCaso NÃO seja relacionado, retorne:\n\n{\n  \"response\": 0,\n  \"RESPOSTA\": \"\"\n}\n\nIMPORTANTE:\n- Retorne SOMENTE JSON válido\n- Não escreva explicações\n- Não use markdown",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -192,
+        -160
+      ],
+      "id": "a2893b9c-3837-4ed9-bd96-dd45acfa8cc0",
+      "name": "Verifica se é sobre chamados ou tickets",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43ac063a-cf2b-47df-8565-18a35962b92c",
+              "leftValue": "={{ $json.message.content.response || $json.message.content.response === 0 ? $json.message.content.response : $json.response }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        -160
+      ],
+      "id": "777adfde-1ad3-4ffe-90b9-983fc500c215",
+      "name": "Garante se é chamado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/webhook/glados-assistente-chamados-ti",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"dadosWebhook\": {{ JSON.stringify($('Webhook').first().json) }},\n  \"dadosConsulta\": {{ JSON.stringify($('Garante se é chamado').first().json) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        -160
+      ],
+      "id": "e70eb080-d35a-450f-bf1b-fe797df8e4d7",
+      "name": "HTTP Request3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Você é um classificador de intenção para mensagens de WhatsApp recebidas pelo n8n.\n\nAnalise a mensagem completa do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nResponda com exatamente UMA destas palavras:\n\ncarregamento\nrotina\nderrubar\nliberar_pedido\nestoque\nchamado\nabertura\nencerrar\natualizar\nnome\ndesconhecido\n\nREGRAS DE SAÍDA:\n\n* Responda somente com uma palavra.\n* Use somente letras minúsculas.\n* Não use JSON.\n* Não use aspas.\n* Não use markdown.\n* Não explique.\n* Não adicione pontuação.\n* Nunca crie uma categoria diferente das permitidas.\n\nConsidere erros de digitação, abreviações, ausência de acentos e linguagem informal.\n\nAnalise a AÇÃO que o usuário deseja, e não apenas palavras isoladas.\n\nUse obrigatoriamente a seguinte ordem de decisão:\n\n1. ABERTURA EXPLÍCITA\n\nResponda `abertura` quando o usuário pedir explicitamente para abrir, criar, registrar ou gerar um novo chamado ou ticket.\n\nEssa regra tem prioridade sobre todas as outras categorias.\n\nExemplos:\n\n* abre um chamado para o carregamento 123\n* cria um ticket sobre a rotina 316\n* registra um chamado para esse problema\n* quero abrir um chamado\n* pode gerar um chamado para mim\n\n2. ENCERRAMENTO DE CHAMADO\n\nResponda `encerrar` quando o usuário pedir para fechar, encerrar, finalizar, resolver ou marcar um chamado existente como solucionado.\n\nExemplos:\n\n* encerra o chamado 123\n* fecha o ticket 456\n* pode finalizar esse atendimento\n* o problema foi resolvido, pode fechar\n* adiciona uma observação e encerra o chamado\n\nQuando houver atualização e encerramento na mesma mensagem, responda `encerrar`.\n\n3. ATUALIZAÇÃO DE CHAMADO\n\nResponda `atualizar` quando o usuário quiser adicionar comentário, resposta, acompanhamento, observação ou informação a um chamado existente, sem pedir encerramento.\n\nExemplos:\n\n* comenta no chamado 123\n* adiciona no ticket que voltou a funcionar\n* atualiza o chamado 456\n* coloca essa informação no atendimento\n* adiciona como comentário interno\n\n4. CONSULTA DE CHAMADO\n\nResponda `chamado` quando o usuário quiser consultar, procurar, listar ou acompanhar chamados existentes.\n\nTambém use quando perguntar sobre status, técnico, SLA, categoria, prazo ou resolução.\n\nExemplos:\n\n* consulta o chamado 123\n* qual o status do ticket 456\n* quem está atendendo meu chamado\n* mostra meus chamados\n* quais chamados estão pendentes\n* verifica se já existe chamado sobre isso\n* quando meu chamado será resolvido\n\nNão classifique apenas pela palavra “chamado”. Observe a ação:\n\n* abrir ou criar = `abertura`\n* consultar ou acompanhar = `chamado`\n* comentar ou atualizar = `atualizar`\n* fechar ou resolver = `encerrar`\n\n5. CARREGAMENTO\n\nResponda `carregamento` quando a mensagem estiver relacionada a carga, carregamento, NUMCAR ou número de carregamento do WMS.\n\nPode ser consulta, erro, falha, processamento ou carregamento travado.\n\nExemplos:\n\n* verifica o carregamento 12345\n* consulta o numcar 456789\n* erro no carregamento 9876\n* problema na carga 555\n* a carga ficou travada\n* carregamento não apareceu no WMS\n* numcar 123 não processou\n\nRelatar erro em carregamento não significa automaticamente abrir chamado.\n\nSomente use `abertura` quando houver pedido explícito para criar um chamado.\n\n6. DERRUBAR SESSÃO DO WINTHOR\n\nResponda `derrubar` quando o usuário quiser desconectar, derrubar, retirar, liberar ou encerrar uma sessão ativa do WinThor.\n\nTambém use quando mencionar:\n\n* usuário preso;\n* usuário ainda conectado;\n* sessão travada;\n* limite máximo de conexões;\n* usuário já conectado;\n* necessidade de liberar uma nova conexão.\n\nExemplos:\n\n* derruba o usuário 123\n* desconecta a matrícula 456\n* usuário preso no WinThor\n* libera a sessão desse usuário\n* tira o usuário que ficou conectado\n* atingiu o limite de conexões\n* aparece que o usuário já está conectado\n* derruba pela rotina 528\n\nA presença da rotina 528 não muda a categoria quando o assunto for sessão ou usuário conectado.\n\nNão use `derrubar` para:\n\n* desbloqueio de senha;\n* usuário bloqueado;\n* criação de usuário;\n* permissão de acesso;\n* liberação de rotina.\n\nEsses casos devem ser `abertura` ou `rotina`, conforme o contexto.\n\n7. LIBERAÇÃO DE PEDIDO\n\nResponda `liberar_pedido` quando o usuário solicitar explicitamente\na liberação, desbloqueio ou aprovação de um pedido de venda no WinThor.\n\nConsidere também variações de linguagem, erros de digitação,\nabreviações e mensagens informais.\n\nExemplos:\n\n* libera o pedido 12345\n* pode liberar o pedido 98765\n* desbloqueia o pedido 456789\n* consegue liberar o pedido 123?\n* pedido 987 está bloqueado, pode liberar?\n* libera pra mim o pedido 654321\n* preciso liberar o pedido 123456\n* glados libera o pedido 555\n* pode desbloquear esse pedido 1234\n\nUse `liberar_pedido` somente quando houver intenção de executar\na liberação/desbloqueio do pedido.\n\nNão use `liberar_pedido` quando o usuário estiver apenas consultando\nou perguntando informações sobre um pedido.\n\nExemplos que NÃO são liberação:\n\n* consulta o pedido 123\n* qual o status do pedido 456\n* quem fez o pedido 789\n* verifica o pedido 123\n* por que o pedido 456 está bloqueado?\n\nSe a mensagem pedir explicitamente para liberar um pedido,\n`liberar_pedido` tem prioridade sobre `rotina`, `abertura`\ne outras categorias genéricas.\n\n8. CONSULTA DE ESTOQUE\n\nResponda `estoque` quando o usuário quiser consultar informações relacionadas\nao estoque de um produto no WinThor.\n\nConsidere consultas sobre:\n\n* quantidade em estoque;\n* saldo de estoque;\n* estoque disponível;\n* estoque geral;\n* estoque reservado;\n* estoque bloqueado;\n* estoque pendente;\n* quantidade disponível para venda;\n* quantidade por filial;\n* disponibilidade de determinado produto;\n* existência de estoque de um produto;\n* posição de estoque;\n* quantidade de produto em determinada filial.\n\nNormalmente a mensagem pode conter:\n\n* código do produto;\n* código da filial;\n* descrição do produto;\n* palavras como estoque, saldo, disponível, quantidade, reserva ou disponibilidade.\n\nExemplos:\n\n* consulta o estoque do produto 932\n* quanto tem de estoque do produto 932?\n* verifica o estoque do produto 123\n* qual o saldo do produto 456?\n* tem estoque do produto 789?\n* quanto tem disponível do produto 932 na filial 6?\n* estoque do produto 932 filial 6\n* produto 932 filial 6\n* consulta produto 932 na filial 6\n* qual a quantidade disponível do produto 123?\n* quanto temos desse produto?\n* tem esse produto na filial 6?\n* verifica se tem disponível o produto 456\n* qual o estoque geral do produto 932?\n* quanto está reservado do produto 932?\n* quanto está bloqueado do produto 932?\n* qual o estoque pendente do produto 932?\n* posição de estoque do produto 932\n* saldo do item 123\n* disponibilidade do item 456\n\nQuando houver código de produto e filial e a intenção for verificar quantidade,\nsaldo ou disponibilidade, responda `estoque`.\n\nExemplos:\n\n* 932 filial 6 tem quanto? = `estoque`\n* produto 932 filial 6 = `estoque`\n* quanto tem do 932 na 6? = `estoque`\n* tem saldo do produto 932? = `estoque`\n\nIMPORTANTE:\n\nNão classifique como `estoque` somente porque a palavra \"produto\" aparece.\n\nExemplos:\n\n* libera o pedido do produto 932 = `liberar_pedido`\n* abre um chamado sobre o produto 932 = `abertura`\n* erro no cadastro do produto 932 = `abertura`\n* carregamento do produto 932 não processou = `carregamento`\n\nSe o usuário pedir explicitamente para abrir um chamado relacionado ao estoque,\nresponda `abertura`.\n\nExemplo:\n\n* abre um chamado porque o estoque do produto 932 está errado = `abertura`\n\nSe o usuário apenas relatar que o estoque parece incorreto, sem solicitar\nexplicitamente a abertura de chamado, responda `estoque`.\n\nExemplos:\n\n* estoque do produto 932 está errado = `estoque`\n* quantidade disponível não bate = `estoque`\n* saldo do produto está diferente da 1118 = `estoque`\n\nA intenção `estoque` deve ter prioridade sobre `rotina` quando a rotina\nfor mencionada apenas como referência para consulta de estoque.\n\nExemplos:\n\n* consulta o estoque do produto 932 igual aparece na 1118 = `estoque`\n* quanto tem disponível na 1118 para o produto 932? = `estoque`\n\nMas se o problema for acesso ou funcionamento da rotina 1118, responda `rotina`.\n\nExemplos:\n\n* não consigo acessar a rotina 1118 = `rotina`\n* libera a rotina 1118 para mim = `rotina`\n* rotina 1118 não abre = `rotina`\n\n\n9. ROTINA DO WINTHOR\n\nResponda `rotina` quando o usuário quiser consultar, acessar, liberar permissão ou relatar problema em uma rotina específica do WinThor.\n\nNormalmente existe número de rotina, matrícula, usuário, acesso ou permissão.\n\nExemplos:\n\n* libera a rotina 316 para a matrícula 123\n* usuário 456 não acessa a rotina 528\n* verifica a rotina 203\n* problema na rotina 132\n* não consigo abrir a rotina 110\n* preciso de acesso à rotina 530\n* matrícula 123 sem permissão na 316\n* consegue verificar a 528\n\nQuando a mensagem contiver somente um número que pareça número de rotina, como “316”, “528” ou “132”, responda `rotina`.\n\nExceção obrigatória:\n\nQuando houver palavras relacionadas a sessão, conexão, usuário preso ou derrubada, responda `derrubar`, mesmo que a rotina 528 seja mencionada.\n\n10. LOCALIZAR USUÁRIO NO GLPI\n\nResponda `nome` quando o usuário quiser localizar uma pessoa no GLPI ou descobrir seu ID, código ou cadastro pelo nome, login ou matrícula.\n\nExemplos:\n\n* procura o usuário Mateus\n* qual o ID do usuário João\n* busca Maria no GLPI\n* localiza o solicitante Carlos\n* verifica o ID dessa matrícula\n* encontra o usuário pelo login\n* qual o código desse usuário no GLPI\n\nNão use `nome` quando a pessoa for apenas parte de outra solicitação.\n\nExemplos:\n\n* abre um chamado para João = `abertura`\n* consulta os chamados de João = `chamado`\n* procura o ID do João = `nome`\n\n11. PROBLEMA TÉCNICO GENÉRICO\n\nResponda `abertura` quando o usuário relatar um problema técnico ou solicitar suporte que não pertença claramente às categorias carregamento, rotina ou derrubar.\n\nNão é necessário escrever literalmente “abrir chamado”.\n\nExemplos:\n\n* não consigo acessar o sistema\n* minha impressora não imprime\n* computador não liga\n* estou sem internet\n* preciso instalar o AnyDesk\n* preciso de acesso ao sistema\n* meu monitor parou\n* o programa está dando erro\n* esqueci minha senha\n* preciso desbloquear meu usuário\n\n12. DESCONHECIDO\n\nResponda `desconhecido` quando não houver solicitação clara.\n\nTambém use para:\n\n* saudação;\n* agradecimento;\n* confirmação;\n* teste;\n* mensagem vazia;\n* texto sem contexto suficiente.\n\nExemplos:\n\n* oi\n* bom dia\n* obrigado\n* valeu\n* ok\n* certo\n* teste\n* glados\n* tem alguém aí\n* entendi\n* beleza\n\nRESUMO DA PRIORIDADE:\n\n1. Pediu explicitamente para criar chamado → `abertura`\n2. Pediu para encerrar chamado → `encerrar`\n3. Pediu para atualizar chamado → `atualizar`\n4. Pediu para consultar chamado → `chamado`\n5. Falou de carga, carregamento ou NUMCAR → `carregamento`\n6. Falou de sessão, conexão ou usuário preso → `derrubar`\n7. Pediu explicitamente para liberar/desbloquear pedido → `liberar_pedido`\n8. Pediu quantidade, saldo, disponibilidade ou posição de estoque de produto → `estoque`\n9. Falou de acesso ou problema em rotina → `rotina`\n10. Pediu ID ou localização de usuário no GLPI → `nome`\n11. Relatou outro problema técnico → `abertura`\n12. Não existe solicitação clara → `desconhecido`\n\nAntes de responder, determine internamente:\n\n* Qual ação principal o usuário está pedindo?\n* A mensagem fala de um chamado já existente?\n* Há um pedido explícito para criar um chamado?\n* O assunto é carregamento?\n* O assunto é sessão ativa ou usuário preso?\n* O usuário quer liberar um pedido?\n* O usuário quer consultar quantidade, saldo ou disponibilidade de estoque?\n* Há código de produto e/ou filial relacionado à consulta de estoque?\n* O assunto é acesso a uma rotina?\n* O usuário quer localizar alguém no GLPI?\n* É outro problema técnico?\n* É somente uma saudação ou confirmação?\n\nResponda somente com a palavra correspondente.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        -96
+      ],
+      "id": "4642ac8a-3e72-49cf-a457-2581737e4e9e",
+      "name": "Classificador de intenção",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Glados Autoatendimento"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $('Webhook').item.json.body.data.message.conversation }}"
+            },
+            {
+              "role": "system",
+              "content": "=Você é um assistente responsável por interpretar mensagens de usuários e transformar essas mensagens em um JSON estruturado para abertura de chamados no GLPI via API.\n\nA mensagem do usuário será:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nDados do usuário localizado no GLPI, se existirem:Regras para solicitante/requerente:\n\n\"nome_solicitante\":\n\n* Preencha com o nome informado na mensagem, se existir.\n* Se não houver nome na mensagem, use \"\".\n\n\"telefone_solicitante\":\n\n* Preencha somente se o telefone estiver claramente na mensagem.\n* Se não estiver, use \"\".\n* Não invente telefone.\n\n\"email_solicitante\":\n\n* Preencha somente se o e-mail estiver claramente na mensagem.\n* Se não estiver, use \"\".\n* Não invente e-mail.\n\n\"id_usuario_glpi\":\n\n* Extraia o ID do usuário GLPI quando a mensagem informar claramente que aquele número é o ID do usuário, ID do requerente, ID do solicitante ou ID GLPI.\n* Também aceite expressões como:\n\n  * \"usuário ID 25\"\n  * \"id do usuário 25\"\n  * \"requerente 25\"\n  * \"solicitante 25\"\n  * \"id requerente 25\"\n  * \"id solicitante 25\"\n  * \"usuário glpi 25\"\n  * \"id glpi 25\"\n  * \"abre para o usuário 25\"\n  * \"cria para o usuário 25\"\n  * \"chamado para o usuário 25\"\n* Se a mensagem informar claramente um número como ID de usuário/requerente/solicitante, use esse número em \"id_usuario_glpi\".\n* Não use número de chamado como ID de usuário.\n* Não use número de rotina como ID de usuário.\n* Não use número de carregamento como ID de usuário.\n* Não use número de telefone como ID de usuário.\n* Não use matrícula como ID do GLPI, a menos que a mensagem diga claramente \"ID GLPI\" ou \"ID do usuário GLPI\".\n* Não invente ID.\n* Se não houver ID confiável, use 0.\n\n\"usuario_glpi_encontrado\":\n\n* Use true quando \"id_usuario_glpi\" for maior que 0.\n* Use false quando \"id_usuario_glpi\" for 0.\n\nRegra obrigatória:\nSempre que \"id_usuario_glpi\" for maior que 0, inclua o campo \"_users_id_requester\" dentro de \"glpi_api_body.input\" com esse mesmo ID.\n\nExemplo:\nSe a mensagem for:\n\"Abra um chamado para o usuário ID 25, ele não consegue acessar o sistema.\"\n\nEntão o JSON deve conter:\n\n\"dados_extraidos\": {\n\"id_usuario_glpi\": 25,\n\"usuario_glpi_encontrado\": true\n}\n\nE o body do GLPI deve conter:\n\n\"glpi_api_body\": {\n\"input\": {\n\"_users_id_requester\": 25\n}\n}\n\nSe \"id_usuario_glpi\" for 0, não inclua \"_users_id_requester\" dentro de \"glpi_api_body.input\".\n\nSua tarefa é analisar a mensagem e extrair as informações possíveis para montar o body de abertura de chamado no GLPI.\n\nIMPORTANTE:\nNem sempre o usuário vai enviar todas as informações.\nMesmo que faltem dados, você deve gerar o JSON com os campos possíveis.\nNão invente informações.\nQuando uma informação não for encontrada, use string vazia \"\", número 0 ou lista vazia [].\nRetorne apenas JSON válido.\nNão use markdown.\nNão use comentários.\nNão escreva explicações fora do JSON.\n\nO endpoint que será usado depois é:\n\nPOST /apirest.php/Ticket\n\nO JSON final deve seguir exatamente esta estrutura:\n\n{\n\"abrir_chamado\": true,\n\"pode_abrir_com_dados_atuais\": true,\n\"dados_extraidos\": {\n\"titulo\": \"\",\n\"descricao\": \"\",\n\"tipo\": 1,\n\"urgencia\": 3,\n\"impacto\": 3,\n\"prioridade\": 3,\n\"nome_solicitante\": \"\",\n\"telefone_solicitante\": \"\",\n\"email_solicitante\": \"\",\n\"id_usuario_glpi\": 0,\n\"usuario_glpi_encontrado\": false,\n\"categoria_sugerida\": \"\",\n\"id_categoria_glpi\": 0,\n\"entidade_glpi\": 0,\n\"resumo_problema\": \"\",\n\"informacoes_faltantes\": [],\n\"mensagem_para_usuario\": \"\"\n},\n\"glpi_api_body\": {\n\"input\": {\n\"name\": \"\",\n\"content\": \"\",\n\"type\": 1,\n\"urgency\": 3,\n\"impact\": 3,\n\"priority\": 3,\n\"entities_id\": 0\n}\n}\n}\n\nRegras para \"abrir_chamado\":\n\nUse true quando a mensagem indicar:\n\n* problema técnico;\n* erro;\n* falha;\n* solicitação de suporte;\n* solicitação de acesso;\n* instalação;\n* liberação;\n* cadastro;\n* alteração;\n* equipamento sem funcionar;\n* sistema indisponível;\n* necessidade de atendimento.\n\nUse false apenas quando a mensagem não tiver intenção clara de suporte ou abertura de chamado.\n\nExemplos de false:\n\n* \"oi\"\n* \"bom dia\"\n* \"tem alguém aí?\"\n* \"obrigado\"\n* \"teste\"\n* \"glados\"\n\nRegras para \"pode_abrir_com_dados_atuais\":\n\nUse true quando a mensagem tiver pelo menos uma descrição mínima do problema ou solicitação.\n\nExemplos de true:\n\n* \"não consigo acessar o sistema\"\n* \"minha impressora não imprime\"\n* \"meu computador não liga\"\n* \"preciso instalar o AnyDesk\"\n* \"estou sem internet\"\n* \"preciso de acesso ao sistema\"\n* \"o sistema está dando erro\"\n\nUse false somente quando a mensagem for vaga demais para abrir um chamado útil.\n\nExemplos de false:\n\n* \"preciso de ajuda\"\n* \"suporte\"\n* \"chamado\"\n* \"quero abrir chamado\"\n* \"alguém pode me ajudar?\"\n\nRegras para \"titulo\":\n\nCrie um título curto e objetivo para o chamado.\nO título será usado no campo \"name\" do GLPI.\nNão invente nome de sistema, equipamento ou setor.\n\nExemplos:\n\n* \"Problema de acesso ao sistema\"\n* \"Impressora não imprime\"\n* \"Computador não liga\"\n* \"Solicitação de instalação de software\"\n* \"Problema de conexão com a internet\"\n\nSe a mensagem for vaga, use:\n\"Solicitação de suporte\"\n\nRegras para \"descricao\":\n\nCrie uma descrição clara, organizada e adequada para o campo \"content\" do GLPI.\nA descrição deve conter apenas informações informadas ou claramente inferidas da mensagem.\nNão invente diagnóstico, causa, solução, setor, telefone, e-mail, patrimônio ou nome de sistema.\n\nMonte a descrição neste estilo:\n\nSolicitação recebida via WhatsApp.\n\nResumo:\n[resumo do problema]\n\nDetalhes informados pelo usuário:\n[detalhes da mensagem]\n\nSolicitante:\n[nome, telefone, e-mail ou usuário GLPI encontrado; caso contrário, \"Não informado\"]\n\nInformações não informadas:\n[lista curta do que está faltando]\n\nRegras para \"tipo\" e \"type\":\n\nUse 1 para Incidente quando o usuário relatar:\n\n* erro;\n* problema;\n* falha;\n* indisponibilidade;\n* algo que parou de funcionar;\n* sistema fora do ar;\n* equipamento com defeito.\n\nUse 2 para Requisição quando o usuário pedir:\n\n* acesso;\n* instalação;\n* criação;\n* cadastro;\n* liberação;\n* alteração;\n* compra;\n* nova configuração;\n* solicitação de serviço.\n\nSe não for possível identificar, use 1.\n\nO campo \"dados_extraidos.tipo\" e o campo \"glpi_api_body.input.type\" devem ter o mesmo valor.\n\nRegras para \"urgencia\" e \"urgency\":\n\nUse valores de 1 a 5.\n\n1 = muito baixa\n2 = baixa\n3 = média\n4 = alta\n5 = muito alta\n\nUse 5 quando o usuário indicar:\n\n* produção parada;\n* sistema crítico parado;\n* operação parada;\n* muitos usuários sem trabalhar;\n* cliente aguardando com impacto crítico.\n\nUse 4 quando indicar:\n\n* usuário sem conseguir trabalhar;\n* setor afetado;\n* problema importante e urgente.\n\nUse 3 quando houver problema comum sem gravidade clara.\n\nUse 2 quando for solicitação simples sem urgência.\n\nUse 1 apenas para dúvida simples ou baixa importância.\n\nSe não houver informação suficiente, use 3.\n\nO campo \"dados_extraidos.urgencia\" e o campo \"glpi_api_body.input.urgency\" devem ter o mesmo valor.\n\nRegras para \"impacto\" e \"impact\":\n\nUse valores de 1 a 5.\n\n1 = impacto muito baixo\n2 = afeta pouco o usuário\n3 = afeta um usuário ou uma atividade normal\n4 = afeta vários usuários, setor ou serviço importante\n5 = afeta toda a empresa, operação crítica ou sistema principal\n\nSe não houver informação suficiente, use 3.\n\nO campo \"dados_extraidos.impacto\" e o campo \"glpi_api_body.input.impact\" devem ter o mesmo valor.\n\nRegras para \"prioridade\" e \"priority\":\n\nUse valores de 1 a 5.\nCalcule com base na urgência e impacto.\n\nSe urgência e impacto forem altos, use 4 ou 5.\nSe urgência e impacto forem médios, use 3.\nSe urgência e impacto forem baixos, use 1 ou 2.\nSe não houver informação suficiente, use 3.\n\nO campo \"dados_extraidos.prioridade\" e o campo \"glpi_api_body.input.priority\" devem ter o mesmo valor.\n\nRegras para solicitante/requerente:\n\n\"nome_solicitante\":\n\n* Preencha com o nome informado na mensagem, se existir.\n* Se não houver nome na mensagem, mas existir Nome do usuário GLPI nos dados recebidos, use esse nome.\n* Se não houver nenhum nome, use \"\".\n\n\"telefone_solicitante\":\n\n* Preencha somente se o telefone estiver claramente na mensagem.\n* Se não estiver, use \"\".\n* Não invente telefone.\n\n\"email_solicitante\":\n\n* Preencha somente se o e-mail estiver claramente na mensagem.\n* Se não estiver, use \"\".\n* Não invente e-mail.\n\n\"id_usuario_glpi\":\n\n* Se o campo \"ID do usuário GLPI\" recebido no contexto for maior que 0, use esse ID.\n* Se a mensagem informar claramente um ID de usuário do GLPI, use esse ID.\n* Não use matrícula como ID do GLPI.\n* Não use telefone como ID do GLPI.\n* Não invente ID.\n* Se não houver ID confiável, use 0.\n\n\"usuario_glpi_encontrado\":\n\n* Use true quando \"id_usuario_glpi\" for maior que 0.\n* Use false quando \"id_usuario_glpi\" for 0.\n\nRegra importante:\nSempre que \"id_usuario_glpi\" for maior que 0, inclua o campo \"_users_id_requester\" dentro de \"glpi_api_body.input\" com esse mesmo ID.\n\nExemplo:\n\"_users_id_requester\": 25\n\nSe \"id_usuario_glpi\" for 0, não inclua \"_users_id_requester\" no \"glpi_api_body.input\".\n\nRegras para categoria:\n\n\"categoria_sugerida\":\nSugira uma categoria simples com base na mensagem.\n\nUse uma destas opções:\n\n* \"Acesso\"\n* \"Internet\"\n* \"Impressora\"\n* \"Sistema\"\n* \"E-mail\"\n* \"Computador\"\n* \"Rede\"\n* \"Telefonia\"\n* \"Solicitação\"\n* \"Outros\"\n\nSe não for possível identificar, use \"Outros\".\n\n\"id_categoria_glpi\":\nUse 0.\nSó preencha com número maior que 0 se a mensagem trouxer claramente o ID da categoria do GLPI.\nNão invente ID de categoria.\n\nRegras para entidade:\n\n\"entidade_glpi\":\nUse 0.\nSó preencha com outro número se a mensagem trouxer claramente o ID da entidade do GLPI.\n\nSempre inclua \"entities_id\" dentro de \"glpi_api_body.input\".\nSe não houver entidade informada, use:\n\n\"entities_id\": 0\n\nRegras para \"informacoes_faltantes\":\n\nListe apenas informações úteis para melhorar o atendimento.\nNão liste informações desnecessárias.\nNão bloqueie a abertura do chamado por falta dessas informações se a descrição mínima do problema já existir.\n\nExemplos de informações faltantes:\n\n* \"nome do sistema\"\n* \"mensagem de erro\"\n* \"setor\"\n* \"nome do solicitante\"\n* \"patrimônio do equipamento\"\n* \"print do erro\"\n* \"quando o problema começou\"\n* \"quantos usuários são afetados\"\n\nSe não faltar nada importante, retorne [].\n\nSe \"id_usuario_glpi\" for 0, adicione \"usuário requerente não localizado no GLPI\" em \"informacoes_faltantes\", mas não bloqueie a abertura do chamado se houver descrição mínima do problema.\n\nRegras para \"mensagem_para_usuario\":\n\nSe \"pode_abrir_com_dados_atuais\" for true:\n\n* Gere uma mensagem curta confirmando que o chamado será aberto.\n* Se houver informações faltantes importantes, peça no máximo 2 informações complementares.\n* Não informe número de chamado, pois ele ainda não foi gerado pelo GLPI.\n\nSe \"pode_abrir_com_dados_atuais\" for false:\n\n* Peça para o usuário explicar melhor o problema ou solicitação.\n* Seja educado, curto e direto.\n\nRegras para \"glpi_api_body\":\n\nO campo \"glpi_api_body\" deve conter o body pronto para o nó HTTP Request do n8n enviar para o GLPI.\n\nSempre gere:\n\n\"glpi_api_body\": {\n\"input\": {\n\"name\": \"[titulo]\",\n\"content\": \"[descricao]\",\n\"type\": [tipo],\n\"urgency\": [urgencia],\n\"impact\": [impacto],\n\"priority\": [prioridade],\n\"entities_id\": [entidade_glpi]\n}\n}\n\nSe \"id_usuario_glpi\" for maior que 0, gere também dentro de \"input\":\n\n\"_users_id_requester\": [id_usuario_glpi]\n\nSomente inclua \"itilcategories_id\" dentro de \"input\" se \"id_categoria_glpi\" for maior que 0.\n\nExemplo:\n\"itilcategories_id\": 8\n\nNão coloque campos com valor vazio dentro de \"glpi_api_body.input\", exceto os campos obrigatórios:\n\n* name\n* content\n* type\n* urgency\n* impact\n* priority\n* entities_id\n\nCritérios finais:\n\nSe a mensagem tiver uma descrição mínima de problema ou solicitação, gere:\n\"abrir_chamado\": true\n\"pode_abrir_com_dados_atuais\": true\n\nSe a mensagem for vaga demais, gere:\n\"abrir_chamado\": false\n\"pode_abrir_com_dados_atuais\": false\n\nMesmo quando \"abrir_chamado\" for false, mantenha a estrutura completa do JSON.\n\nRetorne sempre apenas JSON válido.\nNão use markdown.\nNão use blocos de código.\nNão escreva explicações fora do JSON.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        224
+      ],
+      "id": "930f80ba-f97d-4e80-a6f6-cd31e194c85f",
+      "name": "Gera informações para o chamado",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output[0].content[0].text;\n\nreturn [\n  {\n    json: JSON.parse(texto)\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        224
+      ],
+      "id": "7300e1c0-7f5f-4732-87af-00a79e2b37f7",
+      "name": "Converte para JSON",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/initSession?user_token=xxxxxxxxxxxxxxxxxxxx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        224
+      ],
+      "id": "f7cc945e-847c-47a1-853a-9d69ee902dd3",
+      "name": "GLPI Homolog - Iniciar Sessão",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/Ticket",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            },
+            {
+              "name": "Session-Token",
+              "value": "={{ $json.session_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Converte para JSON').first().json.glpi_api_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        224
+      ],
+      "id": "17f7942c-de5a-4575-b780-adede7741481",
+      "name": "GLPI Sup - Abre Chamado",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        224
+      ],
+      "id": "7c495820-bc83-4ab7-93e3-8e093e2ff0e4",
+      "name": "Envia Zap pra um grupo específico",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Você é um assistente que extrai nomes de mensagens para consulta SQL.\n\nMensagem do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nRetorne apenas JSON válido, sem markdown e sem explicações.\n\nFormato obrigatório:\n\n{\n\"nome_original\": \"\",\n\"nome_para_sql\": \"\",\n\"termos\": [],\n\"tem_nome\": false,\n\"mensagem_para_usuario\": \"\"\n}\n\nRegras:\n\n* Extraia apenas o nome da pessoa que o usuário quer consultar.\n* Ignore palavras como: procure, busque, consulte, verifique, localize, ache, usuário, solicitante, requerente, nome, id, glpi.\n* Não invente nomes.\n* Em \"nome_para_sql\", coloque % no início, entre cada parte do nome e no final.\n* Exemplo: \"Mateus Silva\" vira \"%Mateus%Silva%\".\n* Em \"termos\", retorne cada parte do nome em uma lista.\n* Se encontrar nome, use \"tem_nome\": true e \"mensagem_para_usuario\": \"\".\n* Se não encontrar nome, use \"tem_nome\": false e peça o nome em \"mensagem_para_usuario\".\n\nExemplo de saída com nome:\n\n{\n\"nome_original\": \"Mateus Silva\",\n\"nome_para_sql\": \"%Mateus%Silva%\",\n\"termos\": [\"Mateus\", \"Silva\"],\n\"tem_nome\": true,\n\"mensagem_para_usuario\": \"\"\n}\n\nExemplo de saída sem nome:\n\n{\n\"nome_original\": \"\",\n\"nome_para_sql\": \"\",\n\"termos\": [],\n\"tem_nome\": false,\n\"mensagem_para_usuario\": \"Por favor, informe o nome do usuário que deseja consultar.\"\n}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        32
+      ],
+      "id": "882afabe-5a9e-447c-bca8-56a55728c7e9",
+      "name": "Separa nome usuário",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output?.[0]?.content?.[0]?.text || '';\n\nlet dados;\n\ntry {\n  dados = JSON.parse(texto);\n} catch (error) {\n  return [\n    {\n      json: {\n        erro: true,\n        mensagem: 'Não foi possível converter o texto da IA para JSON.',\n        detalhe: error.message,\n        texto_original: texto\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      nome_original: dados.nome_original || '',\n      nome_para_sql: dados.nome_para_sql || '',\n      termos: Array.isArray(dados.termos) ? dados.termos : [],\n      tem_nome: dados.tem_nome === true,\n      mensagem_para_usuario: dados.mensagem_para_usuario || ''\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        32
+      ],
+      "id": "dc26a3e5-619f-47b1-a3ff-4aef4c20b0ed",
+      "name": "Isola o nome"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  id,\n  CONCAT_WS(' ', firstname, realname) AS nome_completo\nFROM glpi_users\nWHERE is_deleted = 0\n  AND CONCAT_WS(' ', firstname, realname) LIKE '{{ $json.nome_para_sql }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        368,
+        32
+      ],
+      "id": "a04aba71-d6cb-444f-9abc-ea963a669cd1",
+      "name": "Consulta pelo nome",
+      "credentials": {
+        "mySql": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "MySQL GLPI Suporte Supply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const resultados = $input.all().map(item => item.json);\n\nlet mensagem = '';\n\nif (resultados.length === 0) {\n  mensagem = 'Nenhum usuário foi encontrado com esse nome.';\n} else if (resultados.length === 1) {\n  const usuario = resultados[0];\n\n  mensagem =\n`Encontrei 1 usuário:\n\nID: ${usuario.id}\nNome: ${usuario.nome_completo}`;\n} else {\n  mensagem = `Encontrei ${resultados.length} usuários:\\n\\n`;\n\n  mensagem += resultados\n    .map((usuario, index) => {\n      return `${index + 1}. ID: ${usuario.id}\\nNome: ${usuario.nome_completo}`;\n    })\n    .join('\\n\\n');\n}\n\nreturn [\n  {\n    json: {\n      quantidade_encontrada: resultados.length,\n      usuarios: resultados,\n      mensagem_evolution: mensagem\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        32
+      ],
+      "id": "57f51ef9-1262-4e09-b8b6-e5fd2735318f",
+      "name": "Organiza mensagem"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.mensagem_evolution }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        32
+      ],
+      "id": "6f82cd4d-b3e1-4cd2-80d8-543bc5ee5ad9",
+      "name": "Envia a mensagem",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Você é um assistente responsável por interpretar mensagens de usuários e separar informações para adicionar um comentário em um chamado do GLPI.\n\nMensagem do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nSua tarefa é extrair:\n\n1. O número do chamado.\n2. O comentário que deve ser adicionado ao chamado.\n\nRetorne apenas JSON válido.\nNão use markdown.\nNão escreva explicações.\nNão invente informações.\n\nFormato obrigatório:\n\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 0,\n\"comentario\": \"\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"\"\n}\n\nRegras:\n\n* Use \"adicionar_comentario\": true quando o usuário pedir para comentar, responder, adicionar informação, incluir observação, atualizar ou registrar uma resposta em um chamado.\n* Extraia o número do chamado para \"id_chamado\".\n* O número do chamado pode aparecer como:\n\n  * \"chamado 123\"\n  * \"ticket 123\"\n  * \"GLPI 123\"\n  * \"#123\"\n  * \"no chamado 123\"\n  * \"adiciona no 123\"\n* Em \"comentario\", coloque apenas o texto que deve ser incluído no chamado.\n* Remova da resposta frases de comando como:\n\n  * \"adicione no chamado\"\n  * \"comente no ticket\"\n  * \"responda o chamado\"\n  * \"inclua no GLPI\"\n  * \"atualize o chamado\"\n* Não coloque o número do chamado dentro do comentário, a menos que faça parte real do texto.\n* Se o usuário indicar que é comentário interno, privado ou só para TI, use \"comentario_privado\": true.\n* Caso contrário, use \"comentario_privado\": false.\n* Se não encontrar número do chamado, use \"id_chamado\": 0.\n* Se não encontrar comentário, use \"comentario\": \"\".\n* Se faltar número do chamado ou comentário, use \"adicionar_comentario\": false.\n* Em \"mensagem_para_usuario\", peça o dado que estiver faltando.\n* Se tudo estiver correto, gere uma confirmação curta em \"mensagem_para_usuario\".\n\nExemplos:\n\nMensagem:\n\"Adicione no chamado 123 que o usuário informou que o sistema voltou a funcionar.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 123,\n\"comentario\": \"O usuário informou que o sistema voltou a funcionar.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário ao chamado 123.\"\n}\n\nMensagem:\n\"Comente no ticket 456: equipamento foi substituído pelo suporte.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 456,\n\"comentario\": \"Equipamento foi substituído pelo suporte.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário ao chamado 456.\"\n}\n\nMensagem:\n\"Inclua como comentário interno no chamado 789: cliente estava ausente no momento do contato.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 789,\n\"comentario\": \"Cliente estava ausente no momento do contato.\",\n\"comentario_privado\": true,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário interno ao chamado 789.\"\n}\n\nMensagem:\n\"Adicione no chamado que o usuário pediu retorno.\"\n\nResposta:\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 0,\n\"comentario\": \"O usuário pediu retorno.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Por favor, informe o número do chamado para eu adicionar o comentário.\"\n}\n\nMensagem:\n\"Comente no chamado 123\"\n\nResposta:\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 123,\n\"comentario\": \"\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Por favor, informe qual comentário deseja adicionar ao chamado 123.\"\n}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        416
+      ],
+      "id": "cfad0337-f791-458b-b8e5-8ce2af9fc003",
+      "name": "Extrai ID e resposta para o chamado",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/initSession?user_token=xxxxxxxxxxxxxxxxxxxx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        416
+      ],
+      "id": "b236bbd3-48b6-429d-8fcf-7d3f34fd434c",
+      "name": "GLPI Homolog - Iniciar Sessão1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output?.[0]?.content?.[0]?.text || '';\n\nlet dados;\n\ntry {\n  dados = JSON.parse(texto);\n} catch (error) {\n  return [\n    {\n      json: {\n        erro: true,\n        mensagem: 'Não foi possível converter a resposta da IA para JSON.',\n        detalhe: error.message,\n        texto_original: texto\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      adicionar_comentario: dados.adicionar_comentario === true,\n      id_chamado: Number(dados.id_chamado || 0),\n      comentario: dados.comentario || '',\n      comentario_privado: dados.comentario_privado === true,\n      is_private: dados.comentario_privado === true ? 1 : 0,\n      mensagem_para_usuario: dados.mensagem_para_usuario || ''\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        416
+      ],
+      "id": "820a2041-65fd-4413-a1f8-9b2cb8d0830b",
+      "name": "Converte para JSON1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/ITILFollowup",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            },
+            {
+              "name": "Session-Token",
+              "value": "={{ $json.session_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"itemtype\": \"Ticket\",\n    \"items_id\": {{ $('Converte para JSON1').item.json.id_chamado }},\n    \"content\": \"{{ $('Converte para JSON1').item.json.comentario }}\",\n    \"is_private\": 0\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        416
+      ],
+      "id": "8cde7865-6dd5-43db-8748-c583ddc56565",
+      "name": "GLPI Sup - Responde Chamado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Converte para JSON1').item.json.mensagem_para_usuario }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        416
+      ],
+      "id": "14335c67-e918-4d2b-9ce9-980c6aed11ce",
+      "name": "Envia mensagem",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://xxxxxxxxxxxxxxxxxxxx/apirest.php/Ticket/{{ $('Converte para JSON1').item.json.id_chamado }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            },
+            {
+              "name": "Session-Token",
+              "value": "={{ $('GLPI Homolog - Iniciar Sessão1').item.json.session_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"status\": 5\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        416
+      ],
+      "id": "ebbf17d8-174a-4c5a-ab97-c2c15ad539cc",
+      "name": "GLPI Sup - Altera status"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Você é um assistente responsável por interpretar mensagens de usuários e separar informações para adicionar um comentário em um chamado do GLPI.\n\nMensagem do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nSua tarefa é extrair:\n\n1. O número do chamado.\n2. O comentário que deve ser adicionado ao chamado.\n\nRetorne apenas JSON válido.\nNão use markdown.\nNão escreva explicações.\nNão invente informações.\n\nFormato obrigatório:\n\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 0,\n\"comentario\": \"\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"\"\n}\n\nRegras:\n\n* Use \"adicionar_comentario\": true quando o usuário pedir para comentar, responder, adicionar informação, incluir observação, atualizar ou registrar uma resposta em um chamado.\n* Extraia o número do chamado para \"id_chamado\".\n* O número do chamado pode aparecer como:\n\n  * \"chamado 123\"\n  * \"ticket 123\"\n  * \"GLPI 123\"\n  * \"#123\"\n  * \"no chamado 123\"\n  * \"adiciona no 123\"\n* Em \"comentario\", coloque apenas o texto que deve ser incluído no chamado.\n* Remova da resposta frases de comando como:\n\n  * \"adicione no chamado\"\n  * \"comente no ticket\"\n  * \"responda o chamado\"\n  * \"inclua no GLPI\"\n  * \"atualize o chamado\"\n* Não coloque o número do chamado dentro do comentário, a menos que faça parte real do texto.\n* Se o usuário indicar que é comentário interno, privado ou só para TI, use \"comentario_privado\": true.\n* Caso contrário, use \"comentario_privado\": false.\n* Se não encontrar número do chamado, use \"id_chamado\": 0.\n* Se não encontrar comentário, use \"comentario\": \"\".\n* Se faltar número do chamado ou comentário, use \"adicionar_comentario\": false.\n* Em \"mensagem_para_usuario\", peça o dado que estiver faltando.\n* Se tudo estiver correto, gere uma confirmação curta em \"mensagem_para_usuario\".\n\nExemplos:\n\nMensagem:\n\"Adicione no chamado 123 que o usuário informou que o sistema voltou a funcionar.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 123,\n\"comentario\": \"O usuário informou que o sistema voltou a funcionar.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário ao chamado 123.\"\n}\n\nMensagem:\n\"Comente no ticket 456: equipamento foi substituído pelo suporte.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 456,\n\"comentario\": \"Equipamento foi substituído pelo suporte.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário ao chamado 456.\"\n}\n\nMensagem:\n\"Inclua como comentário interno no chamado 789: cliente estava ausente no momento do contato.\"\n\nResposta:\n{\n\"adicionar_comentario\": true,\n\"id_chamado\": 789,\n\"comentario\": \"Cliente estava ausente no momento do contato.\",\n\"comentario_privado\": true,\n\"mensagem_para_usuario\": \"Certo, vou adicionar esse comentário interno ao chamado 789.\"\n}\n\nMensagem:\n\"Adicione no chamado que o usuário pediu retorno.\"\n\nResposta:\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 0,\n\"comentario\": \"O usuário pediu retorno.\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Por favor, informe o número do chamado para eu adicionar o comentário.\"\n}\n\nMensagem:\n\"Comente no chamado 123\"\n\nResposta:\n{\n\"adicionar_comentario\": false,\n\"id_chamado\": 123,\n\"comentario\": \"\",\n\"comentario_privado\": false,\n\"mensagem_para_usuario\": \"Por favor, informe qual comentário deseja adicionar ao chamado 123.\"\n}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        608
+      ],
+      "id": "f9457503-c7b6-4245-b104-e073776064d8",
+      "name": "Extrai comentário e número do chamado",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output?.[0]?.content?.[0]?.text || '';\n\nlet dados;\n\ntry {\n  dados = JSON.parse(texto);\n} catch (error) {\n  return [\n    {\n      json: {\n        erro: true,\n        mensagem: 'Não foi possível converter a resposta da IA para JSON.',\n        detalhe: error.message,\n        texto_original: texto\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      adicionar_comentario: dados.adicionar_comentario === true,\n      id_chamado: Number(dados.id_chamado || 0),\n      comentario: dados.comentario || '',\n      comentario_privado: dados.comentario_privado === true,\n      is_private: dados.comentario_privado === true ? 1 : 0,\n      mensagem_para_usuario: dados.mensagem_para_usuario || ''\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        608
+      ],
+      "id": "279d37eb-3a02-4049-af49-bd611c0defac",
+      "name": "Converte para JSON2"
+    },
+    {
+      "parameters": {
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/initSession?user_token=xxxxxxxxxxxxxxxxxxxx",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        608
+      ],
+      "id": "09790b34-8379-44a2-9efe-5b352e40b89a",
+      "name": "GLPI Homolog - Iniciar Sessão2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/apirest.php/ITILFollowup",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "App-Token",
+              "value": "xxxxxxxxxxxxxxxxxxxx"
+            },
+            {
+              "name": "Session-Token",
+              "value": "={{ $json.session_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"itemtype\": \"Ticket\",\n    \"items_id\": {{ $('Converte para JSON2').item.json.id_chamado }},\n    \"content\": \"{{ $('Converte para JSON2').item.json.comentario }}\",\n    \"is_private\": 0\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        608
+      ],
+      "id": "bb3047e0-2935-474c-81cf-8bc321d1f169",
+      "name": "GLPI Sup - Responde Chamado1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Converte para JSON2').item.json.mensagem_para_usuario }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        608
+      ],
+      "id": "abcc6fd3-6d6b-48d2-9326-297d1daf7334",
+      "name": "Envia mensagem1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "96a3df0a-0a1c-4cdb-8f8e-81a547c54f3d",
+              "leftValue": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}",
+              "rightValue": "xxxxxxxxxxxxxxxxxxxx",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        800
+      ],
+      "id": "24ceb76b-5253-4939-bda2-bad00f41336e",
+      "name": "Está entre os autorizados?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=Não autorizado."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        896
+      ],
+      "id": "b2653daa-c2a7-47ff-bd46-742d0ff1cdb4",
+      "name": "Msg não autorizado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}",
+        "value": "={{ $('Converte para JSON3').item.json.numped }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 180
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        800
+      ],
+      "id": "9f728cac-3bcb-4fd7-b794-7761af17fea1",
+      "name": "Cria estado",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Você é um assistente responsável apenas por extrair o número do pedido informado na mensagem do usuário.\n\nMensagem do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nA mensagem já foi previamente classificada como uma solicitação relacionada à liberação de pedido.\n\nSua única tarefa é identificar o número do pedido.\n\nRetorne apenas JSON válido.\nNão use markdown.\nNão escreva explicações.\nNão invente informações.\n\nFormato obrigatório:\n\n{\n\"numped\": 0,\n\"mensagem_para_usuario\": \"\"\n}\n\nREGRAS:\n\n* Extraia o número referente ao pedido.\n\n* Retorne o número como valor numérico, sem aspas.\n\n* O número pode aparecer em formatos como:\n\n  * \"pedido 123\"\n  * \"pedido nº 123\"\n  * \"pedido número 123\"\n  * \"pedido: 123\"\n  * \"numped 123\"\n  * \"numped: 123\"\n  * \"liberar pedido 123\"\n  * \"libera o pedido 123\"\n  * \"libera o 123\"\n  * \"desbloqueia o pedido 123\"\n  * \"aprova o pedido 123\"\n\n* Quando houver somente um número na mensagem, considere esse número como o número do pedido.\n\n* Ignore números que estejam claramente identificados como outra informação, como:\n\n  * matrícula\n  * rotina\n  * carregamento\n  * NUMCAR\n  * chamado\n  * ticket\n  * telefone\n  * CPF\n  * CNPJ\n\n* Se existirem vários números na mensagem, escolha somente aquele que estiver associado ao pedido.\n\n* Nunca invente um número.\n\nSe encontrar o número do pedido:\n\n{\n\"numped\": NUMERO_DO_PEDIDO,\n\"mensagem_para_usuario\": \"\"\n}\n\nSe não encontrar o número do pedido:\n\n{\n\"numped\": 0,\n\"mensagem_para_usuario\": \"Por favor, informe o número do pedido que deseja liberar.\"\n}\n\nEXEMPLOS:\n\nMensagem:\n\n\"glados, liberar pedido 123\"\n\nResposta:\n\n{\n\"numped\": 123,\n\"mensagem_para_usuario\": \"\"\n}\n\nMensagem:\n\n\"pode liberar o pedido 987654\"\n\nResposta:\n\n{\n\"numped\": 987654,\n\"mensagem_para_usuario\": \"\"\n}\n\nMensagem:\n\n\"libera o 456789\"\n\nResposta:\n\n{\n\"numped\": 456789,\n\"mensagem_para_usuario\": \"\"\n}\n\nMensagem:\n\n\"libera o pedido pra mim\"\n\nResposta:\n\n{\n\"numped\": 0,\n\"mensagem_para_usuario\": \"Por favor, informe o número do pedido que deseja liberar.\"\n}\n\nMensagem:\n\n\"libera o pedido 123 para a matrícula 456\"\n\nResposta:\n\n{\n\"numped\": 123,\n\"mensagem_para_usuario\": \"\"\n}\n\nResponda sempre somente com JSON válido.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        800
+      ],
+      "id": "64511690-5f27-4e8c-a719-b913201bb39e",
+      "name": "Extrai número pedido",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output?.[0]?.content?.[0]?.text || '';\n\nlet dados;\n\ntry {\n  dados = JSON.parse(texto);\n} catch (error) {\n  return [\n    {\n      json: {\n        erro: true,\n        numped: 0,\n        mensagem_para_usuario: 'Não foi possível interpretar a resposta da IA.',\n        texto_original: texto,\n        detalhe: error.message\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      erro: false,\n      numped: Number(dados.numped) || 0,\n      mensagem_para_usuario: dados.mensagem_para_usuario || ''\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        800
+      ],
+      "id": "27b9454a-7285-4399-89b8-23666e9485a2",
+      "name": "Converte para JSON3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const registros = $input.all().map(item => item.json);\n\n// Separa cada tipo de registro\nconst pedido = registros.find(r => r.TIPO === 'PEDIDO');\nconst itens = registros.filter(r => r.TIPO === 'ITEM');\nconst bloqueios = registros.filter(r => r.TIPO === 'BLOQUEIO');\n\n// Validação\nif (!pedido) {\n  return [\n    {\n      json: {\n        erro: true,\n        mensagem: 'Não foi possível localizar os dados principais do pedido.'\n      }\n    }\n  ];\n}\n\n// Formata moeda\nconst moeda = (valor) => {\n  return Number(valor || 0).toLocaleString('pt-BR', {\n    style: 'currency',\n    currency: 'BRL'\n  });\n};\n\n// Formata quantidade\nconst quantidade = (valor) => {\n  const numero = Number(valor || 0);\n\n  if (Number.isInteger(numero)) {\n    return numero.toString();\n  }\n\n  return numero.toLocaleString('pt-BR');\n};\n\n// ==============================\n// CABEÇALHO\n// ==============================\n\nlet mensagem = `📦 *PEDIDO ${pedido.NUMPED}*\\n\\n`;\n\nmensagem += `👤 *Cliente:* ${pedido.CODCLI} - ${pedido.CLIENTE}\\n`;\nmensagem += `💰 *Valor da venda:* ${moeda(pedido.VLTOTAL)}\\n`;\nmensagem += `📌 *Posição:* ${pedido.POSICAO || 'Não informada'}\\n`;\n\n// ==============================\n// ITENS\n// ==============================\n\nmensagem += `\\n━━━━━━━━━━━━━━━━━━\\n`;\nmensagem += `🛒 *ITENS DO PEDIDO*\\n`;\nmensagem += `━━━━━━━━━━━━━━━━━━\\n\\n`;\n\nif (itens.length > 0) {\n  itens.forEach((item, index) => {\n    mensagem += `${index + 1}. *${item.CODPROD}* - ${item.DESCRICAO}\\n`;\n    mensagem += `   📦 Quantidade: ${quantidade(item.QT)}\\n`;\n    mensagem += `   💵 Unitário: ${moeda(item.PVENDA)}\\n`;\n    mensagem += `   💰 Total item: ${moeda(item.VLTOTAL_ITEM)}\\n\\n`;\n  });\n} else {\n  mensagem += `Nenhum item encontrado.\\n\\n`;\n}\n\n// ==============================\n// BLOQUEIOS\n// ==============================\n\nmensagem += `━━━━━━━━━━━━━━━━━━\\n`;\nmensagem += `🚫 *MOTIVOS DE BLOQUEIO*\\n`;\nmensagem += `━━━━━━━━━━━━━━━━━━\\n\\n`;\n\nif (bloqueios.length > 0) {\n  bloqueios.forEach((bloqueio, index) => {\n    mensagem += `${index + 1}. ${bloqueio.MOTIVO}\\n\\n`;\n  });\n} else {\n  mensagem += `✅ Nenhum bloqueio encontrado para este pedido.\\n`;\n}\n\n// ==============================\n// RETORNO\n// ==============================\n\nreturn [\n  {\n    json: {\n      erro: false,\n      numped: pedido.NUMPED,\n      codcli: pedido.CODCLI,\n      cliente: pedido.CLIENTE,\n      vltotal: pedido.VLTOTAL,\n      posicao: pedido.POSICAO,\n\n      quantidade_itens: itens.length,\n      quantidade_bloqueios: bloqueios.length,\n\n      itens: itens.map(item => ({\n        codprod: item.CODPROD,\n        descricao: item.DESCRICAO,\n        qt: item.QT,\n        pvenda: item.PVENDA,\n        vltotal_item: item.VLTOTAL_ITEM\n      })),\n\n      bloqueios: bloqueios.map(item => ({\n        motivo: item.MOTIVO\n      })),\n\n      mensagem: mensagem.trim()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        800
+      ],
+      "id": "46490ecd-3e93-4a1b-a262-4deb086ca31f",
+      "name": "Compila informações"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.mensagem }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        800
+      ],
+      "id": "ad617e91-321e-4f55-abf5-5dfcac2cd98d",
+      "name": "Envia a mensagem1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "SELECT\n    'PEDIDO' AS TIPO,\n    1 AS ORDEM,\n    p.NUMPED,\n    p.CODCLI,\n    c.CLIENTE,\n    p.VLTOTAL,\n    p.POSICAO,\n    NULL AS CODPROD,\n    NULL AS DESCRICAO,\n    NULL AS QT,\n    NULL AS PVENDA,\n    NULL AS VLTOTAL_ITEM,\n    NULL AS MOTIVO\nFROM PCPEDC p\nJOIN PCCLIENT c\n    ON c.CODCLI = p.CODCLI\nWHERE p.NUMPED = {{ $('Converte para JSON3').item.json.numped }}\n\nUNION ALL\n\nSELECT\n    'ITEM' AS TIPO,\n    2 AS ORDEM,\n    i.NUMPED,\n    NULL AS CODCLI,\n    NULL AS CLIENTE,\n    NULL AS VLTOTAL,\n    NULL AS POSICAO,\n    i.CODPROD,\n    pr.DESCRICAO,\n    i.QT,\n    i.PVENDA,\n    (i.QT * i.PVENDA) AS VLTOTAL_ITEM,\n    NULL AS MOTIVO\nFROM PCPEDI i\nJOIN PCPRODUT pr\n    ON pr.CODPROD = i.CODPROD\nWHERE i.NUMPED = {{ $('Converte para JSON3').item.json.numped }}\n\nUNION ALL\n\nSELECT\n    'BLOQUEIO' AS TIPO,\n    3 AS ORDEM,\n    b.NUMPED,\n    NULL AS CODCLI,\n    NULL AS CLIENTE,\n    NULL AS VLTOTAL,\n    NULL AS POSICAO,\n    NULL AS CODPROD,\n    NULL AS DESCRICAO,\n    NULL AS QT,\n    NULL AS PVENDA,\n    NULL AS VLTOTAL_ITEM,\n    b.MOTIVO\nFROM PCBLOQUEIOSPEDIDO b\nWHERE b.NUMPED = {{ $('Converte para JSON3').item.json.numped }}\n\nORDER BY ORDEM",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.oracleDatabase",
+      "typeVersion": 1,
+      "position": [
+        784,
+        800
+      ],
+      "id": "6f396558-664e-40bf-b570-963e9628084c",
+      "name": "Informações pedido",
+      "credentials": {
+        "oracleDBApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Oracle Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=⚠️*ATENÇÃO*⚠️\nA liberação por este meio não valida estoque disponível.\nLiberar mesmo assim?\nResponda sim ou não."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1616,
+        800
+      ],
+      "id": "c5165fcb-f9bf-42b1-b195-3b40619e6f16",
+      "name": "Confirma liberação?",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "estado",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        800
+      ],
+      "id": "9bbabb78-27fd-44e9-8897-f68522f636a1",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "estado",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1984,
+        -272
+      ],
+      "id": "a9924724-173d-44ba-b50b-44fee16ec14d",
+      "name": "Consulta estado",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eb6188fa-6e57-45a4-aeba-b17e4de138df",
+              "leftValue": "={{ $json.estado }}",
+              "rightValue": "libera_pedido",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f9094377-a85b-4d75-8a2a-c0058046fd53",
+              "leftValue": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}",
+              "rightValue": "xxxxxxxxxxxxxxxxxxxx",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1776,
+        -272
+      ],
+      "id": "3da2d443-d0fe-4f22-baae-bfe4364b87a5",
+      "name": "Triagem"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        800
+      ],
+      "id": "d769ccca-968a-472b-8b74-6b29167f54ed",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "SELECT origemped, posicao\nFROM pcpedc \nWHERE numped = {{ $json.estado }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.oracleDatabase",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        -560
+      ],
+      "id": "07425e00-caca-4db9-a650-4cb65d35c5a4",
+      "name": "Dados pedido",
+      "credentials": {
+        "oracleDBApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Oracle Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "be8eff80-2e5f-42ae-8588-26e310a4f3d8",
+              "leftValue": "={{ $json.ORIGEMPED }}",
+              "rightValue": "T",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1136,
+        -560
+      ],
+      "id": "2c82fefa-3f90-45db-bd52-b7bc3846befe",
+      "name": "É telemarketing?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.POSICAO }}",
+                    "rightValue": "F",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "15ba64a4-40d0-4cff-b1c7-2ac87ed33ea0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Faturado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "532d0662-e638-4f79-9696-19ab8ba2ee3d",
+                    "leftValue": "={{ $json.POSICAO }}",
+                    "rightValue": "C",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cancelado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0dfbbb25-2de0-4330-80d1-41f03c19b4cf",
+                    "leftValue": "={{ $json.POSICAO }}",
+                    "rightValue": "L",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Liberado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5cafad54-236a-4560-a732-6437459060eb",
+                    "leftValue": "={{ $json.POSICAO }}",
+                    "rightValue": "M",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Montado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6abc3e62-4232-41e2-8bf1-ae8db85329a7",
+                    "leftValue": "={{ $json.POSICAO }}",
+                    "rightValue": "B",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bloqueado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        -800
+      ],
+      "id": "32a1de71-c9e7-46b8-9137-9012bd03e123",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "BEGIN\n\n  UPDATE pcpedc\n  SET posicao = 'L'\n  WHERE numped = {{ $('Consulta estado').item.json.estado }}\n    AND origemped = 'T';\n\n  UPDATE pcpedi\n  SET posicao = 'L'\n  WHERE numped = {{ $('Consulta estado').item.json.estado }};\n\nEND;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.oracleDatabase",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -624
+      ],
+      "id": "e7a79ed4-7337-403f-a814-fd603238253c",
+      "name": "Libera pedido",
+      "credentials": {
+        "oracleDBApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Oracle Produção"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=UPDATE pcpedc\nSET posicao = 'L'\nWHERE numped = {{ $('Consulta estado').item.json.estado }}\nAND origemped = 'T'\n\nUPDATE pcpedi\nSET posicao = 'L'\nWHERE numped = {{ $('Consulta estado').item.json.estado }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        -624
+      ],
+      "id": "0edae7fd-c68d-4414-89e7-33379e881f77",
+      "name": "Informa pedido liberado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=Só é permitido liberar pedidos do tipo TELEMARKETING."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -896,
+        -512
+      ],
+      "id": "9399bed0-ab42-4f92-8146-2dc800c437aa",
+      "name": "Apenas telemarketing",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=Pedido já faturado."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        -1008
+      ],
+      "id": "c81e8b42-2f0e-4fcc-ba7a-aecf98ec13e3",
+      "name": "Já faturado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=O pedido está cancelado."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -944
+      ],
+      "id": "d3400c7a-4e7b-4291-bb02-b20701863811",
+      "name": "Cancelado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=Pedido já liberado."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        -864
+      ],
+      "id": "372095f6-f9a8-4010-b07f-c919e4062f46",
+      "name": "Liberado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "=O pedido já montado."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -800
+      ],
+      "id": "dacfb606-f8a3-4081-ba5b-df8569315593",
+      "name": "Montado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -1088
+      ],
+      "id": "c20d47f3-4720-4c64-a7f3-b8e2c4ac5c51",
+      "name": "Reseta estado",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e2f317a5-5163-4f71-9350-5ccab82fc860",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "rightValue": "\\b(Sim|sim|s|sm|SIM)\\b",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1568,
+        -448
+      ],
+      "id": "7001a122-8788-4061-b38e-684166d9e929",
+      "name": "Sim ou não?"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{   $('Webhook').item.json.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid   || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt   || $('Webhook').item.json.data?.key?.remoteJid   || $('Webhook').item.json.data?.key?.remoteJidAlt   || '' }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        -336
+      ],
+      "id": "9101cc6b-aacf-4f16-b8c2-bb1f7b7eff25",
+      "name": "Reseta estado1",
+      "credentials": {
+        "redis": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "==Você é um assistente responsável por interpretar mensagens de usuários e extrair informações de filial e código de produto.\n\nMensagem do usuário:\n\n{{ $('Webhook').item.json.body.data.message.conversation }}\n\nSua tarefa é extrair:\n\n1. O número da filial.\n2. Um ou mais códigos de produto informados pelo usuário.\n\nRetorne apenas JSON válido.\nNão use markdown.\nNão escreva explicações.\nNão invente informações.\n\nFormato obrigatório:\n\n{\n  \"dados_validos\": false,\n  \"filial\": 0,\n  \"produtos\": [],\n  \"mensagem_para_usuario\": \"\"\n}\n\nREGRAS:\n\n* Em \"filial\", informe somente o número da filial.\n* Em \"produtos\", retorne uma lista contendo todos os códigos de produto encontrados.\n* O campo \"produtos\" deve SEMPRE ser um array.\n* Mesmo que exista apenas um produto, retorne-o dentro de um array.\n* Os códigos dos produtos devem ser números inteiros.\n* Não confunda o número da filial com código de produto.\n* Não invente filial ou produto.\n* Ignore textos que não façam parte da filial ou dos códigos dos produtos.\n\nA filial pode aparecer de formas como:\n\n* \"filial 1\"\n* \"filial 02\"\n* \"da filial 3\"\n* \"na filial 4\"\n* \"fil 5\"\n\nOs produtos podem aparecer de formas como:\n\n* \"produto 123\"\n* \"codprod 123\"\n* \"código 123\"\n* \"produto 123 e 456\"\n* \"produtos 123, 456 e 789\"\n* \"códigos 123 456 789\"\n* \"codprod 123, 456, 789\"\n\nVALIDAÇÃO:\n\n* Se encontrar filial E pelo menos um produto:\n  - \"dados_validos\": true\n  - \"mensagem_para_usuario\": gere uma confirmação curta.\n\n* Se NÃO encontrar filial:\n  - \"dados_validos\": false\n  - \"filial\": 0\n  - mantenha os produtos encontrados em \"produtos\".\n  - \"mensagem_para_usuario\": peça para o usuário informar a filial.\n\n* Se NÃO encontrar nenhum produto:\n  - \"dados_validos\": false\n  - \"produtos\": []\n  - mantenha a filial encontrada em \"filial\".\n  - \"mensagem_para_usuario\": peça para o usuário informar o código do produto.\n\n* Se não encontrar nem filial nem produto:\n  - \"dados_validos\": false\n  - \"filial\": 0\n  - \"produtos\": []\n  - \"mensagem_para_usuario\": peça a filial e o código do produto.\n\nIMPORTANTE:\n\n* Não considere qualquer número da mensagem automaticamente como produto.\n* Use o contexto das palavras \"produto\", \"produtos\", \"codprod\", \"código\" ou \"códigos\" para identificar produtos.\n* Use o contexto da palavra \"filial\" ou \"fil\" para identificar a filial.\n* Caso existam vários produtos após a palavra \"produtos\", extraia todos eles.\n* Remova códigos duplicados da lista.\n* Preserve somente números inteiros.\n\nEXEMPLOS:\n\nMensagem:\n\"Consulta o produto 12345 na filial 2\"\n\nResposta:\n{\n  \"dados_validos\": true,\n  \"filial\": 2,\n  \"produtos\": [12345],\n  \"mensagem_para_usuario\": \"Certo, vou consultar o produto 12345 na filial 2.\"\n}\n\nMensagem:\n\"Verifique os produtos 12345, 67890 e 45678 na filial 3\"\n\nResposta:\n{\n  \"dados_validos\": true,\n  \"filial\": 3,\n  \"produtos\": [12345, 67890, 45678],\n  \"mensagem_para_usuario\": \"Certo, vou consultar 3 produtos na filial 3.\"\n}\n\nMensagem:\n\"Consulta os produtos 123 e 456\"\n\nResposta:\n{\n  \"dados_validos\": false,\n  \"filial\": 0,\n  \"produtos\": [123, 456],\n  \"mensagem_para_usuario\": \"Por favor, informe a filial para realizar a consulta.\"\n}\n\nMensagem:\n\"Consulta na filial 2\"\n\nResposta:\n{\n  \"dados_validos\": false,\n  \"filial\": 2,\n  \"produtos\": [],\n  \"mensagem_para_usuario\": \"Por favor, informe o código do produto que deseja consultar.\"\n}\n\nMensagem:\n\"Quero consultar estoque\"\n\nResposta:\n{\n  \"dados_validos\": false,\n  \"filial\": 0,\n  \"produtos\": [],\n  \"mensagem_para_usuario\": \"Por favor, informe a filial e o código do produto.\"\n}\n\nMensagem:\n\"Na filial 4 consulta codprod 123, 456, 789 e 456\"\n\nResposta:\n{\n  \"dados_validos\": true,\n  \"filial\": 4,\n  \"produtos\": [123, 456, 789],\n  \"mensagem_para_usuario\": \"Certo, vou consultar 3 produtos na filial 4.\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        1072
+      ],
+      "id": "aa633b19-10c8-4a85-98f2-de62d9ed370b",
+      "name": "Extrai codprod e filial",
+      "credentials": {
+        "openAiApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API OpenAI - Cérebro Glados"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.output?.[0]?.content?.find(\n  item => item.type === 'output_text'\n)?.text;\n\nif (!texto) {\n  throw new Error('Não foi possível localizar a resposta do modelo.');\n}\n\nlet dados;\n\ntry {\n  dados = JSON.parse(texto);\n} catch (error) {\n  throw new Error(`Resposta da IA não é um JSON válido: ${texto}`);\n}\n\nconst produtos = Array.isArray(dados.produtos)\n  ? dados.produtos\n      .map(Number)\n      .filter(Number.isFinite)\n  : [];\n\nreturn {\n  json: {\n    dados_validos: dados.dados_validos === true,\n    filial: Number(dados.filial) || 0,\n    produtos: produtos,\n    produtos_csv: produtos.join(','),\n    quantidade_produtos: produtos.length,\n    mensagem_para_usuario: dados.mensagem_para_usuario || ''\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1072
+      ],
+      "id": "962234ca-4d02-40f5-a967-627e86a164c3",
+      "name": "Trata informações"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b37c20e4-2e00-4b35-9513-ed5208095e52",
+              "leftValue": "={{ $json.dados_validos }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        1072
+      ],
+      "id": "190bd693-b6b8-4a68-b29b-68df8079dfe1",
+      "name": "Dados válidos?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Trata informações').item.json.mensagem_para_usuario }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        1232
+      ],
+      "id": "d1000ccb-bd1c-4987-a89d-c9cf53c23c1d",
+      "name": "Mensagem dados inválidos",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "execute",
+        "query": "SELECT\n    P.CODPROD,\n    P.DESCRICAO,\n    P.UNIDADE,\n\n    E.CODFILIAL,\n    F.FANTASIA AS FILIAL,\n\n    /* Estoque */\n    NVL(E.QTESTGER, 0) AS ESTOQUE_GERAL,\n\n    /* A 1118 exibe bloqueado descontando a avaria */\n    NVL(E.QTBLOQUEADA, 0)\n        - NVL(E.QTINDENIZ, 0) AS QTD_BLOQUEADA,\n\n    NVL(E.QTINDENIZ, 0) AS QTD_AVARIA,\n\n    NVL(E.QTPENDENTE, 0) AS QTD_PENDENTE,\n\n    NVL(E.QTRESERV, 0) AS QTD_RESERVADA,\n\n    NVL(E.QTINDUSTRIA, 0) AS QTD_INDUSTRIA,\n\n    NVL(E.QTPEDIDA, 0) AS QTD_PEDIDA,\n\n    NVL(E.QTTRANSITO, 0) AS QTD_TRANSITO,\n\n    /* Campo mostrado pela 1118 */\n    NVL(E.QTRESERV, 0)\n        + NVL(E.QTPENDENTE, 0) AS RESERVADO_MAIS_PENDENTE,\n\n    /* Disponível conforme resultado da 1118 */\n    NVL(E.QTESTGER, 0)\n        - NVL(E.QTBLOQUEADA, 0)\n        - NVL(E.QTRESERV, 0)\n        - NVL(E.QTPENDENTE, 0) AS QTD_DISPONIVEL\n\nFROM PCPRODUT P\n\nJOIN PCEST E\n    ON E.CODPROD = P.CODPROD\n\nLEFT JOIN PCFILIAL F\n    ON F.CODIGO = E.CODFILIAL\n\nWHERE P.CODPROD IN ({{ $json.produtos_csv }})\n  AND E.CODFILIAL = {{ $json.filial }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.oracleDatabase",
+      "typeVersion": 1,
+      "position": [
+        576,
+        1072
+      ],
+      "id": "0a746278-3c19-4a47-8f8e-9726e44c6725",
+      "name": "Consulta estoque",
+      "credentials": {
+        "oracleDBApi": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "Oracle Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const itens = $input.all();\n\nif (!itens.length) {\n  return [\n    {\n      json: {\n        mensagem: '❌ Nenhum produto foi encontrado para a consulta.'\n      }\n    }\n  ];\n}\n\nconst filial = itens[0].json.FILIAL || '';\nconst codFilial = itens[0].json.CODFILIAL || '';\n\nlet mensagem = `📦 *Consulta de Estoque*\\n\\n`;\n\nif (filial) {\n  mensagem += `🏢 *Filial:* ${codFilial} - ${filial}\\n`;\n}\n\nmensagem += `📋 *Produtos encontrados:* ${itens.length}\\n\\n`;\n\nitens.forEach((item, index) => {\n  const p = item.json;\n\n  mensagem += `━━━━━━━━━━━━━━━━━━\\n`;\n  mensagem += `📦 *Produto ${index + 1}*\\n\\n`;\n\n  mensagem += `🔢 *Código:* ${p.CODPROD ?? '-'}\\n`;\n  mensagem += `📝 *Descrição:* ${p.DESCRICAO ?? '-'}\\n`;\n  mensagem += `📏 *Unidade:* ${p.UNIDADE ?? '-'}\\n\\n`;\n\n  mensagem += `📊 *Estoque*\\n`;\n  mensagem += `• Estoque geral: ${p.ESTOQUE_GERAL ?? 0}\\n`;\n  mensagem += `• Bloqueado: ${p.QTD_BLOQUEADA ?? 0}\\n`;\n  mensagem += `• Avaria: ${p.QTD_AVARIA ?? 0}\\n`;\n  mensagem += `• Pendente: ${p.QTD_PENDENTE ?? 0}\\n`;\n  mensagem += `• Reservado: ${p.QTD_RESERVADA ?? 0}\\n`;\n  mensagem += `• Indústria: ${p.QTD_INDUSTRIA ?? 0}\\n`;\n  mensagem += `• Pedido: ${p.QTD_PEDIDA ?? 0}\\n`;\n  mensagem += `• Trânsito: ${p.QTD_TRANSITO ?? 0}\\n`;\n\n  mensagem += `\\n✅ *Disponível:* ${p.QTD_DISPONIVEL ?? 0}\\n\\n`;\n});\n\nreturn [\n  {\n    json: {\n      quantidade_produtos: itens.length,\n      filial: codFilial,\n      nome_filial: filial,\n      mensagem: mensagem.trim()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        1072
+      ],
+      "id": "547891a7-eab5-420c-ae10-cc9efa0f2fc6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://xxxxxxxxxxxxxxxxxxxx/message/sendText/techsupply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{\n  $('Webhook').item.json.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.body?.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJid\n  || $('Webhook').item.json.dadosWebhook?.body?.data?.key?.remoteJidAlt\n  || $('Webhook').item.json.data?.key?.remoteJid\n  || $('Webhook').item.json.data?.key?.remoteJidAlt\n  || ''\n}}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.mensagem }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        1072
+      ],
+      "id": "fa72ddf5-1d5c-4a48-846c-e9198131023a",
+      "name": "Mensagem dados inválidos1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "xxxxxxxxxxxxxxxxxxxx",
+          "name": "API Evo techsupply"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Consulta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é mencionado": {
+      "main": [
+        [
+          {
+            "node": "Classificador de intenção",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é sobre carregamento": {
+      "main": [
+        [
+          {
+            "node": "Confirmação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é grupo": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é mencionado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classificador de intenção",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é sobre carregamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é sobre rotinas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é sobre derrubar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é sobre chamados ou tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Separa nome usuário",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gera informações para o chamado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extrai ID e resposta para o chamado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extrai comentário e número do chamado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Está entre os autorizados?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extrai codprod e filial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmação": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Filtro mensagem própria": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é sobre rotinas": {
+      "main": [
+        [
+          {
+            "node": "Garante que é sobre rotina",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Garante que é sobre rotina": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Verifica se é sobre derrubar": {
+      "main": [
+        [
+          {
+            "node": "Garante que é sobre derrubar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Garante que é sobre derrubar": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Verifica se é sobre chamados ou tickets": {
+      "main": [
+        [
+          {
+            "node": "Garante se é chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Garante se é chamado": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classificador de intenção": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gera informações para o chamado": {
+      "main": [
+        [
+          {
+            "node": "Converte para JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte para JSON": {
+      "main": [
+        [
+          {
+            "node": "GLPI Homolog - Iniciar Sessão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Homolog - Iniciar Sessão": {
+      "main": [
+        [
+          {
+            "node": "GLPI Sup - Abre Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Sup - Abre Chamado": {
+      "main": [
+        [
+          {
+            "node": "Envia Zap pra um grupo específico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa nome usuário": {
+      "main": [
+        [
+          {
+            "node": "Isola o nome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Isola o nome": {
+      "main": [
+        [
+          {
+            "node": "Consulta pelo nome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta pelo nome": {
+      "main": [
+        [
+          {
+            "node": "Organiza mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organiza mensagem": {
+      "main": [
+        [
+          {
+            "node": "Envia a mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai ID e resposta para o chamado": {
+      "main": [
+        [
+          {
+            "node": "Converte para JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Homolog - Iniciar Sessão1": {
+      "main": [
+        [
+          {
+            "node": "GLPI Sup - Responde Chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte para JSON1": {
+      "main": [
+        [
+          {
+            "node": "GLPI Homolog - Iniciar Sessão1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Sup - Responde Chamado": {
+      "main": [
+        [
+          {
+            "node": "Envia mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia mensagem": {
+      "main": [
+        [
+          {
+            "node": "GLPI Sup - Altera status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai comentário e número do chamado": {
+      "main": [
+        [
+          {
+            "node": "Converte para JSON2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte para JSON2": {
+      "main": [
+        [
+          {
+            "node": "GLPI Homolog - Iniciar Sessão2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Homolog - Iniciar Sessão2": {
+      "main": [
+        [
+          {
+            "node": "GLPI Sup - Responde Chamado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLPI Sup - Responde Chamado1": {
+      "main": [
+        [
+          {
+            "node": "Envia mensagem1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Está entre os autorizados?": {
+      "main": [
+        [
+          {
+            "node": "Extrai número pedido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Msg não autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria estado": {
+      "main": [
+        [
+          {
+            "node": "Confirma liberação?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai número pedido": {
+      "main": [
+        [
+          {
+            "node": "Converte para JSON3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte para JSON3": {
+      "main": [
+        [
+          {
+            "node": "Informações pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compila informações": {
+      "main": [
+        [
+          {
+            "node": "Envia a mensagem1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia a mensagem1": {
+      "main": [
+        [
+          {
+            "node": "Cria estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informações pedido": {
+      "main": [
+        [
+          {
+            "node": "Compila informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirma liberação?": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta estado": {
+      "main": [
+        [
+          {
+            "node": "Triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triagem": {
+      "main": [
+        [
+          {
+            "node": "Sim ou não?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filtro mensagem própria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados pedido": {
+      "main": [
+        [
+          {
+            "node": "É telemarketing?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "É telemarketing?": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Apenas telemarketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Já faturado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cancelado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Liberado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Montado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Libera pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Libera pedido": {
+      "main": [
+        [
+          {
+            "node": "Informa pedido liberado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informa pedido liberado": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apenas telemarketing": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Já faturado": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancelado": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liberado": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montado": {
+      "main": [
+        [
+          {
+            "node": "Reseta estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sim ou não?": {
+      "main": [
+        [
+          {
+            "node": "Dados pedido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reseta estado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reseta estado1": {
+      "main": [
+        [
+          {
+            "node": "Filtro mensagem própria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai codprod e filial": {
+      "main": [
+        [
+          {
+            "node": "Trata informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trata informações": {
+      "main": [
+        [
+          {
+            "node": "Dados válidos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados válidos?": {
+      "main": [
+        [
+          {
+            "node": "Consulta estoque",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem dados inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta estoque": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Mensagem dados inválidos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "xxxxxxxxxxxxxxxxxxxx"
+  }
+}
