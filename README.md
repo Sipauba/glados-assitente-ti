@@ -20,6 +20,12 @@ O workflow direciona solicitações sobre carregamento, rotinas do WinThor, derr
 - `examples/mensagens.md`: exemplos sintéticos.
 - `.env.example`: nomes de variáveis sugeridos, sem valores reais.
 
+## Workflow no n8n
+
+![Visão geral do workflow Glados no n8n](docs/images/workflow-glados-sanitizado.png)
+
+A captura mostra os filtros de entrada, a classificação de intenções e as rotas de atendimento, chamados, pedidos e estoque. O fluxo de confirmação de pedidos utiliza Redis para controlar o estado da conversa. Os endereços dos serviços foram ocultados na imagem.
+
 ## Arquitetura
 
 ```mermaid
@@ -48,10 +54,6 @@ Consulte [docs/arquitetura.md](docs/arquitetura.md) e [docs/fluxo-intencoes.md](
 5. Valide integrações em homologação antes de habilitar operações que alteram chamados ou pedidos.
 
 O JSON preserva a estrutura e as conexões, mas exige reconfiguração e não deve ser ativado diretamente em produção.
-
-## Projetos relacionados
-
-[kb_glados_dti](https://github.com/Sipauba/kb_glados_dti) mantém a base de conhecimento do bot. Este repositório contém automação, orquestração e integrações; a base de conhecimento orienta quais informações o bot deve coletar do usuário. Mudanças nela podem alterar o comportamento do atendimento. Os projetos permanecem separados, mas têm dependência lógica entre si.
 
 ## Segurança
 

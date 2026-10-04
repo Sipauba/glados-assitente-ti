@@ -14,4 +14,4 @@ O node **Classificador de intenção** categoriza a mensagem e encaminha a execu
 
 O fluxo também filtra mensagens próprias, verifica menções e diferencia mensagens de grupo. Revise as rotas e as condições de autorização para cada implantação.
 
-Os prompts foram mantidos no JSON sanitizado. A base de conhecimento relacionada, [kb_glados_dti](https://github.com/Sipauba/kb_glados_dti), orienta quais informações solicitar e pode alterar o comportamento percebido do bot.
+Os prompts foram mantidos no JSON sanitizado. Os critérios de classificação e as instruções para extrair informações estão definidos nos nodes do próprio workflow.
