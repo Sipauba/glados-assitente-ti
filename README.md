@@ -56,7 +56,3 @@ O JSON preserva a estrutura e as conexões, mas exige reconfiguração e não de
 ## Segurança
 
 Mantenha Credentials no n8n ou em um gerenciador de segredos. Nunca versione `.env`, tokens, dados reais de clientes ou exports sem sanitização. Veja [docs/seguranca.md](docs/seguranca.md).
-
-## Licença
-
-Licença MIT. Consulte [LICENSE](LICENSE).
